@@ -1,0 +1,109 @@
+<div class="dashboard-container">
+  <!-- Header -->
+  <header class="dashboard-header">
+    <div class="header-content">
+      <div class="logo">
+        <mat-icon>security</mat-icon>
+        <span>SecureApp</span>
+      </div>
+      
+      <div class="user-section" *ngIf="user">
+        <div class="user-info">
+          <mat-icon>account_circle</mat-icon>
+          <span class="username">{{ user.username }}</span>
+          <span class="role-badge" *ngIf="user.authorities?.includes('ROLE_ADMIN')">Admin</span>
+        </div>
+        <button mat-stroked-button color="warn" (click)="logout()" class="logout-btn">
+          <mat-icon>exit_to_app</mat-icon>
+          Logout
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="dashboard-content">
+    <div class="content-wrapper">
+      <h1 class="page-title">Dashboard</h1>
+      
+      <!-- Loading State -->
+      <div *ngIf="loading" class="loading-container">
+        <mat-spinner diameter="50"></mat-spinner>
+        <p>Loading protected data...</p>
+      </div>
+
+      <!-- Error State -->
+      <div *ngIf="error && !loading" class="error-container">
+        <mat-icon class="error-icon">error_outline</mat-icon>
+        <p class="error-message">{{ error }}</p>
+        <p class="debug-info" *ngIf="debugInfo">{{ debugInfo }}</p>
+        <button mat-raised-button color="primary" (click)="retry()">
+          <mat-icon>refresh</mat-icon>
+          Try Again
+        </button>
+      </div>
+
+      <!-- Success State -->
+      <div *ngIf="!loading && !error && protectedData" class="data-container">
+        <!-- Welcome Card -->
+        <mat-card class="welcome-card">
+          <mat-card-content>
+            <div class="welcome-content">
+              <mat-icon class="success-icon">check_circle</mat-icon>
+              <div>
+                <h2>Welcome back, {{ user?.username }}! 👋</h2>
+                <p>You have successfully accessed a protected resource.</p>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- API Response Card -->
+        <mat-card class="data-card">
+          <mat-card-header>
+            <mat-icon mat-card-avatar>api</mat-icon>
+            <mat-card-title>Protected API Response</mat-card-title>
+            <mat-card-subtitle>Data from /api/protected/hello</mat-card-subtitle>
+          </mat-card-header>
+          
+          <mat-card-content>
+            <div class="code-block">
+              <pre>{{ protectedData | json }}</pre>
+            </div>
+          </mat-card-content>
+          
+          <mat-card-actions align="end">
+            <button mat-button (click)="retry()">
+              <mat-icon>refresh</mat-icon>
+              Refresh
+            </button>
+          </mat-card-actions>
+        </mat-card>
+
+        <!-- User Info Card -->
+        <mat-card class="info-card">
+          <mat-card-header>
+            <mat-icon mat-card-avatar>verified_user</mat-icon>
+            <mat-card-title>Authentication Details</mat-card-title>
+            <mat-card-subtitle>Your current session information</mat-card-subtitle>
+          </mat-card-header>
+          
+          <mat-card-content>
+            <div class="info-grid">
+              <div class="info-item">
+                <span class="label">Username:</span>
+                <span class="value">{{ user?.username }}</span>
+              </div>
+              <div class="info-item">
+                <span class="label">Authorities:</span>
+                <div class="tags">
+                  <span class="tag" *ngFor="let auth of user?.authorities">{{ auth }}</span>
+                </div>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
+  </main>
+</div>
